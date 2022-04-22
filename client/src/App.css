@@ -1,0 +1,202 @@
+body {
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.main-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 40px;
+    margin-bottom: 80px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.table-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 1440px;
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    padding: 50px;
+}
+
+.row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 20px 50px;
+  }
+
+  .input-col {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  .submit-button {
+    width: 100%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+
+  .submit-button:hover {
+    background-color: #45a049;
+  }
+
+  .login-container {
+    width: 100%;
+    max-width: 700px;
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    padding: 50px;
+  }
+
+  .login-button {
+    width: 100%;
+    background-color: blueviolet;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+
+  .login-button:hover, .batch-button:hover, .mentor-button:hover {
+    background-color: blue;
+  }
+
+  .filter-container {
+    width: 100%;
+    max-width: 1440px;
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    padding: 25px;
+  }
+
+  nav {
+    z-index: 1; 
+    position: fixed;
+	display: flex;
+    background-color: white;
+	box-shadow:  0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	position: sticky;
+	align-items: center;
+	top: 0;
+	width: 100vw;
+}
+
+.nav-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.batch-button {
+    display: inline-block;
+    background-color: blueviolet;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 30px;
+}
+
+.mentor-button {
+    display: inline-block;
+    background-color: blueviolet;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 30px;
+}
+
+.admin-buttons-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+.git-banner {
+    width: 60px;
+    height: 60px;
+    margin: 14px;
+}
+
+@media only screen and (max-width: 768px) {
+    .row {
+        grid-template-columns: 1fr;
+    }
+
+    .form-container {
+        padding: 25px;
+    }
+
+    .login-container {
+        padding: 25px;
+    }
+
+    .git-banner {
+        width: 50px;
+        height: 50px;
+        margin: 12px;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    .batch-button {
+        display: inline-block;
+        background-color: blueviolet;
+        color: white;
+        padding: 8px 8px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-right: 10px;
+    }
+    
+    .mentor-button {
+        display: inline-block;
+        background-color: blueviolet;
+        color: white;
+        padding: 8px 8px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-right: 10px;
+    }
+}
