@@ -73,19 +73,19 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  internshipCert: {
+  insCert: {
     type: String,
     required: true,
   },
-  internshipReport: {
+  insRep: {
     type: String,
     required: true,
   },
-  internshipExtEval: {
+  insExtEval: {
     type: String,
     required: true,
   },
-  intenshipExtFed: {
+  insExtFed: {
     type: String,
     required: true,
   },

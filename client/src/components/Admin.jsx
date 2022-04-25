@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import banner from "./gitbanner.png";
 import MaterialTable from "@material-table/core";
 import { ExportPdf, ExportCsv } from "@material-table/exporters";
+import download from "downloadjs";
 
 function Admin() {
   const [data, setData] = useState([]);
@@ -140,7 +141,6 @@ function Admin() {
       if (result.error) {
         window.alert(result.error);
       } else {
-        console.log(result);
         setData(result.message);
       }
     } catch (err) {
@@ -164,7 +164,6 @@ function Admin() {
       if (result.error) {
         window.alert(result.error);
       } else {
-        console.log(result);
         setData(result.message);
       }
     } catch (err) {
@@ -188,7 +187,6 @@ function Admin() {
       if (result.error) {
         window.alert(result.error);
       } else {
-        console.log(result);
         setData(result.message);
       }
     } catch (err) {
@@ -256,6 +254,47 @@ function Admin() {
     }
   };
 
+  const DownloadFile = async (data) => {
+    for (var i = 0; i < 4; i++) {
+      if (i === 0) {
+        const filename = data.insCert;
+        Download(filename);
+      } else if (i === 1) {
+        const filename = data.insRep;
+        Download(filename);
+      } else if (i === 2) {
+        const filename = data.insExtEval;
+        Download(filename);
+      } else if (i === 3) {
+        const filename = data.insExtFed;
+        Download(filename);
+      }
+    }
+  };
+
+  const Download = async (filename) => {
+    try {
+      const res = await fetch("http://localhost:5000/api/download", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          filename,
+        }),
+      });
+
+      const blob = await res.blob();
+      if (!blob) {
+        window.alert("Something went wrong please try again");
+      } else {
+        download(blob, filename);
+      }
+    } catch (err) {
+      window.alert(err.message);
+    }
+  };
+
   const columns = [
     { title: "Name", field: "name", width: "80%" },
     { title: "USN", field: "usn" },
@@ -274,10 +313,10 @@ function Admin() {
     { title: "To be Evaluated", field: "toBeEval" },
     { title: "Mode of Internship", field: "modeOfInternship" },
     { title: "Mentor Name", field: "mentorName" },
-    { title: "Internship Certificate", field: "internshipCert" },
-    { title: "Internship Report", field: "internshipReport" },
-    { title: "Internship External Evaluation", field: "internshipExtEval" },
-    { title: "Internship External Feedback", field: "intenshipExtFed" },
+    { title: "Internship Certificate", field: "insCert" },
+    { title: "Internship Report", field: "insRep" },
+    { title: "Internship External Evaluation", field: "insExtEval" },
+    { title: "Internship External Feedback", field: "insExtFed" },
   ];
 
   return (
@@ -401,6 +440,7 @@ function Admin() {
               search: true,
               exportFileName: "Internship-Data",
               paging: true,
+              actionsColumnIndex: -1,
               exportMenu: [
                 {
                   label: "Export PDF",
@@ -419,6 +459,16 @@ function Admin() {
                 whiteSpace: "nowrap",
               },
             }}
+            actions={[
+              {
+                icon: "download",
+                tooltip: "Download",
+                onClick: (event, rowData) => {
+                  DownloadFile(rowData);
+                  // deleteInternship(rowData.usn);
+                },
+              },
+            ]}
           />
         </div>
       </div>

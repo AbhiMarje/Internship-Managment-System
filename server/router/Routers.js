@@ -1,12 +1,61 @@
 const express = require("express");
 const router = express.Router();
 const cors = require("cors");
+const multer = require("multer");
 
 router.use(cors());
 
 const User = require("../models/userSchema.js");
 const Batch = require("../models/Batch.js");
 const Mentors = require("../models/Mentors.js");
+
+router.post("/api/download", (req, res) => {
+  const { filename } = req.body;
+  const file = "../public/uploads/" + filename;
+  res.download(file);
+});
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "../public/uploads");
+  },
+  filename: (req, file, cb) => {
+    cb(null, req.headers.usn + "_" + file.originalname);
+  },
+});
+
+var upload = multer({ storage: storage });
+
+router.post(
+  "/api/uploads",
+  upload.fields([
+    {
+      name: "Internship_Certificate",
+      maxCount: 1,
+    },
+    {
+      name: "Internship_Report",
+      maxCount: 1,
+    },
+    {
+      name: "Internship_External_Evaluation",
+      maxCount: 1,
+    },
+    {
+      name: "Intenship_External_Fedback",
+      maxCount: 1,
+    },
+  ]),
+  (req, res) => {
+    try {
+      return res.status(200).json({ message: "Files uploaded successfully" });
+    } catch (err) {
+      return res
+        .status(400)
+        .json({ message: "Something went wrong please try again" });
+    }
+  }
+);
 
 router.post("/api/deleteMentor", async (req, res) => {
   const { mentor } = req.body;
@@ -180,10 +229,10 @@ router.post("/api/ims", async (req, res) => {
       toBeEval,
       modeOfInternship,
       mentorName,
-      internshipCert,
-      internshipReport,
-      internshipExtEval,
-      intenshipExtFed,
+      insCert,
+      insRep,
+      insExtEval,
+      insExtFed,
     } = req.body;
 
     if (
@@ -205,10 +254,10 @@ router.post("/api/ims", async (req, res) => {
       !toBeEval ||
       !modeOfInternship ||
       !mentorName ||
-      !internshipCert ||
-      !internshipReport ||
-      !internshipExtEval ||
-      !intenshipExtFed
+      !insCert ||
+      !insRep ||
+      !insExtEval ||
+      !insExtFed
     ) {
       res.status(400).json({ message: "Please fill all the fields" });
     } else {
@@ -231,15 +280,15 @@ router.post("/api/ims", async (req, res) => {
         toBeEval,
         modeOfInternship,
         mentorName,
-        internshipCert,
-        internshipReport,
-        internshipExtEval,
-        intenshipExtFed,
+        insCert,
+        insRep,
+        insExtEval,
+        insExtFed,
       });
 
       await user.save();
 
-      res.status(200).json({ message: "Successfully Submitted" });
+      res.status(200).json({ message: "Submiited Successfully" });
     }
   } catch (err) {
     res.json({ message: "Something went wrong please try again" });

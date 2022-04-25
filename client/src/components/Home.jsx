@@ -20,10 +20,10 @@ function Home() {
   const [toBeEval, setToBeEval] = useState("Yes");
   const [modeOfInternship, setModeOfInternship] = useState("Online");
   const [mentorName, setMentorName] = useState("");
-  const [internshipCert, setInternshipCert] = useState("");
-  const [internshipReport, setInternshipReport] = useState("");
-  const [internshipExtEval, setInternshipExtEval] = useState("");
-  const [intenshipExtFed, setIntenshipExtFed] = useState("");
+  const [internshipCert, setInternshipCert] = useState();
+  const [internshipReport, setInternshipReport] = useState();
+  const [internshipExtEval, setInternshipExtEval] = useState();
+  const [intenshipExtFed, setIntenshipExtFed] = useState();
   const [batches, setBatches] = useState([]);
   const [mentors, setMentors] = useState([]);
 
@@ -36,66 +36,111 @@ function Home() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:5000/api/ims", {
+      if (
+        !internshipCert ||
+        !internshipReport ||
+        !internshipExtEval ||
+        !intenshipExtFed
+      ) {
+        window.alert("Please fill all the fields");
+      } else {
+        const insCert = usn + "_" + internshipCert.name;
+        const insRep = usn + "_" + internshipReport.name;
+        const insExtEval = usn + "_" + internshipExtEval.name;
+        const insExtFed = usn + "_" + intenshipExtFed.name;
+
+        const res = await fetch("http://localhost:5000/api/ims", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            usn,
+            batch,
+            noOfInternship,
+            nameOfIndustry,
+            AddressOfIndustry,
+            internshipDomain,
+            startDate,
+            endDate,
+            weeksOfInternship,
+            industryGuide,
+            emailOfIndustryGuide,
+            noOfIndustryGuide,
+            stipendReceived,
+            amountOfStipend,
+            toBeEval,
+            modeOfInternship,
+            mentorName,
+            insCert,
+            insRep,
+            insExtEval,
+            insExtFed,
+          }),
+        });
+
+        const result = await res.json();
+
+        if (res.status === 400 || !result) {
+          window.alert(result.message);
+        } else {
+          await UploadFiles();
+
+          window.alert(result.message);
+
+          setName("");
+          setusn("");
+          setBatch("");
+          setNoOfInternship("1st Internship");
+          setNameOfIndustry("");
+          setAddressOfIndustry("");
+          setInternshipDomain("App Development");
+          setStartDate("");
+          setEndDate("");
+          setWeeksOfInternship(0);
+          setIndustryGuide("");
+          setEmailOfIndustryGuide("");
+          setNoOfIndustryGuide("");
+          setStipendReceived("Yes");
+          setAmountOfStipend("");
+          setToBeEval("Yes");
+          setModeOfInternship("Online");
+          setMentorName("");
+          setInternshipCert("");
+          setInternshipReport("");
+          setInternshipExtEval("");
+          setIntenshipExtFed("");
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const UploadFiles = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("Internship_Certificate", internshipCert);
+      formData.append("Internship_Report", internshipReport);
+      formData.append("Internship_External_Evaluation", internshipExtEval);
+      formData.append("Intenship_External_Fedback", intenshipExtFed);
+      formData.append("usn", usn);
+
+      const response = await fetch("http://localhost:5000/api/uploads", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          usn: usn,
         },
-        body: JSON.stringify({
-          name,
-          usn,
-          batch,
-          noOfInternship,
-          nameOfIndustry,
-          AddressOfIndustry,
-          internshipDomain,
-          startDate,
-          endDate,
-          weeksOfInternship,
-          industryGuide,
-          emailOfIndustryGuide,
-          noOfIndustryGuide,
-          stipendReceived,
-          amountOfStipend,
-          toBeEval,
-          modeOfInternship,
-          mentorName,
-          internshipCert,
-          internshipReport,
-          internshipExtEval,
-          intenshipExtFed,
-        }),
+        body: formData,
       });
 
-      const result = await res.json();
+      const result = await response.json();
 
-      if (res.status === 400 || !result) {
+      if (!result || response.status === 500) {
         window.alert(result.message);
       } else {
         window.alert(result.message);
-
-        setName("");
-        setusn("");
-        setBatch("");
-        setNoOfInternship("1st Internship");
-        setNameOfIndustry("");
-        setAddressOfIndustry("");
-        setInternshipDomain("App Development");
-        setStartDate("");
-        setEndDate("");
-        setWeeksOfInternship(0);
-        setIndustryGuide("");
-        setEmailOfIndustryGuide("");
-        setNoOfIndustryGuide("");
-        setStipendReceived("Yes");
-        setAmountOfStipend("");
-        setToBeEval("Yes");
-        setModeOfInternship("Online");
-        setMentorName("");
-        setInternshipCert("");
-        setInternshipReport("");
-        setInternshipExtEval("");
-        setIntenshipExtFed("");
       }
     } catch (err) {
       console.log(err);
@@ -110,7 +155,7 @@ function Home() {
       },
     });
     const result = await response.json();
-    if (response.status === 422 || !result) {
+    if (response.status === 500 || !result) {
       window.alert(result.message);
     } else {
       setBatches(result.message);
@@ -359,40 +404,36 @@ function Home() {
                 Internship Certificate:
                 <input
                   className="input-col"
-                  type="text"
-                  value={internshipCert}
+                  type="file"
                   placeholder="Internship Certificate"
-                  onChange={(e) => setInternshipCert(e.target.value)}
+                  onChange={(e) => setInternshipCert(e.target.files[0])}
                 />
               </label>
               <label className="column">
                 Internship Report:
                 <input
                   className="input-col"
-                  type="text"
-                  value={internshipReport}
+                  type="file"
                   placeholder="Internship Report"
-                  onChange={(e) => setInternshipReport(e.target.value)}
+                  onChange={(e) => setInternshipReport(e.target.files[0])}
                 />
               </label>
               <label className="column">
                 Internship External Evaluation:
                 <input
                   className="input-col"
-                  type="text"
-                  value={internshipExtEval}
+                  type="file"
                   placeholder="Internship External Evaluation"
-                  onChange={(e) => setInternshipExtEval(e.target.value)}
+                  onChange={(e) => setInternshipExtEval(e.target.files[0])}
                 />
               </label>
               <label className="column">
                 Internship External Feedback:
                 <input
                   className="input-col"
-                  type="text"
-                  value={intenshipExtFed}
+                  type="file"
                   placeholder="Internship External Feedback"
-                  onChange={(e) => setIntenshipExtFed(e.target.value)}
+                  onChange={(e) => setIntenshipExtFed(e.target.files[0])}
                 />
               </label>
             </div>
