@@ -212,7 +212,7 @@ router.post("/api/ims", async (req, res) => {
   try {
     const {
       name,
-      usn,
+      USN,
       batch,
       noOfInternship,
       nameOfIndustry,
@@ -237,7 +237,7 @@ router.post("/api/ims", async (req, res) => {
 
     if (
       !name ||
-      !usn ||
+      !USN ||
       !batch ||
       !noOfInternship ||
       !nameOfIndustry ||
@@ -263,7 +263,7 @@ router.post("/api/ims", async (req, res) => {
     } else {
       const user = new User({
         name,
-        usn,
+        USN,
         batch,
         noOfInternship,
         nameOfIndustry,

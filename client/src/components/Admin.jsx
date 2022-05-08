@@ -7,9 +7,13 @@ import download from "downloadjs";
 function Admin() {
   const [data, setData] = useState([]);
   const [filter, setFilter] = useState("USN");
+  const [deleteFilter, setDeleteFilter] = useState("USN");
   const [mentor, setMentor] = useState("");
+  const [deleteMentor, setDeleteMentor] = useState("");
   const [usn, setusn] = useState("");
+  const [deleteUsn, setDeleteUsn] = useState("");
   const [batch, setBatch] = useState("");
+  const [deleteBatch, setDeleteBatch] = useState("");
   const [batches, setBatches] = useState([]);
   const [mentors, setMentors] = useState([]);
 
@@ -22,7 +26,11 @@ function Admin() {
     e.preventDefault();
 
     if (filter === "USN") {
-      fetchDataByUSN();
+      if (usn) {
+        fetchDataByUSN();
+      } else {
+        window.alert("Please enter USN");
+      }
     } else if (filter === "Batch") {
       fetchDataByBatch();
     } else if (filter === "Mentor") {
@@ -33,6 +41,21 @@ function Admin() {
 
     setFilter("USN");
     setusn("");
+  };
+
+  const HandleDelete = (e) => {
+    e.preventDefault();
+
+    if (deleteFilter === "USN") {
+      console.log(deleteUsn);
+    } else if (deleteFilter === "Batch") {
+      console.log(deleteBatch);
+    } else if (deleteFilter === "Mentor") {
+      console.log(deleteMentor);
+    }
+
+    setDeleteFilter("USN");
+    setDeleteUsn("");
   };
 
   const DeleteMentor = async () => {
@@ -296,7 +319,7 @@ function Admin() {
 
   const columns = [
     { title: "Name", field: "name", width: "80%" },
-    { title: "USN", field: "usn" },
+    { title: "USN", field: "USN" },
     { title: "Batch", field: "batch" },
     { title: "No. of Internship", field: "noOfInternship" },
     { title: "Name of Industry", field: "nameOfIndustry" },
@@ -469,6 +492,78 @@ function Admin() {
               },
             ]}
           />
+        </div>
+      </div>
+      <div className="main-container">
+        <div className="filter-container">
+          <form onSubmit={HandleDelete}>
+            <label className="column">
+              Delete By:
+              <select
+                className="input-col"
+                value={deleteFilter}
+                onChange={(e) => setDeleteFilter(e.target.value)}
+              >
+                <option value="USN">USN</option>
+                <option value="Mentor">Mentor</option>
+                <option value="Batch">Batch</option>
+              </select>
+            </label>
+            {deleteFilter === "Mentor" ? (
+              <label className="column">
+                Mentor:
+                <select
+                  className="input-col"
+                  value={deleteMentor}
+                  onChange={(e) => setDeleteMentor(e.target.value)}
+                >
+                  <option>Select a Mentor</option>
+                  {mentors.map((mentor, i) => (
+                    <option key={i} value={mentor.mentor} selected="true">
+                      {mentor.mentor}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : (
+              ""
+            )}
+            {deleteFilter === "Batch" ? (
+              <label className="column">
+                Batch:
+                <select
+                  className="input-col"
+                  defaultValue={batches[0].batch}
+                  value={deleteBatch}
+                  onChange={(e) => setDeleteBatch(e.target.value)}
+                >
+                  <option>Select a Batch</option>
+                  {batches.map((batch, i) => (
+                    <option key={i} value={batch.batch}>
+                      {batch.batch}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : (
+              ""
+            )}
+            {deleteFilter === "USN" ? (
+              <label className="column">
+                USN:
+                <input
+                  className="input-col"
+                  type="text"
+                  value={deleteUsn}
+                  placeholder="USN"
+                  onChange={(e) => setDeleteUsn(e.target.value)}
+                />
+              </label>
+            ) : (
+              ""
+            )}
+            <input className="login-button" type="submit" value="Delete" />
+          </form>
         </div>
       </div>
     </div>

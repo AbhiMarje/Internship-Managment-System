@@ -44,10 +44,11 @@ function Home() {
       ) {
         window.alert("Please fill all the fields");
       } else {
-        const insCert = usn + "_" + internshipCert.name;
-        const insRep = usn + "_" + internshipReport.name;
-        const insExtEval = usn + "_" + internshipExtEval.name;
-        const insExtFed = usn + "_" + intenshipExtFed.name;
+        const USN = usn.toUpperCase();
+        const insCert = USN + "_" + internshipCert.name;
+        const insRep = USN + "_" + internshipReport.name;
+        const insExtEval = USN + "_" + internshipExtEval.name;
+        const insExtFed = USN + "_" + intenshipExtFed.name;
 
         const res = await fetch("http://localhost:5000/api/ims", {
           method: "POST",
@@ -56,7 +57,7 @@ function Home() {
           },
           body: JSON.stringify({
             name,
-            usn,
+            USN,
             batch,
             noOfInternship,
             nameOfIndustry,
@@ -88,6 +89,8 @@ function Home() {
           await UploadFiles();
 
           window.alert(result.message);
+
+          document.getElementById("student-form").reset();
 
           setName("");
           setusn("");
@@ -125,12 +128,12 @@ function Home() {
       formData.append("Internship_Report", internshipReport);
       formData.append("Internship_External_Evaluation", internshipExtEval);
       formData.append("Intenship_External_Fedback", intenshipExtFed);
-      formData.append("usn", usn);
+      formData.append("usn", usn.toUpperCase());
 
       const response = await fetch("http://localhost:5000/api/uploads", {
         method: "POST",
         headers: {
-          usn: usn,
+          usn: usn.toUpperCase(),
         },
         body: formData,
       });
@@ -185,7 +188,7 @@ function Home() {
       </nav>
       <div className="main-container">
         <div className="form-container">
-          <form onSubmit={HandleSubmit}>
+          <form id="student-form" onSubmit={HandleSubmit}>
             <div className="row">
               <label className="column">
                 Enter your Name:
