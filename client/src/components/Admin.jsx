@@ -48,7 +48,6 @@ function Admin() {
       }),
     });
     const result = await response.json();
-    console.log(result);
     if (!result.message) {
       window.alert("Something went wrong please try again");
     } else {
@@ -305,6 +304,7 @@ function Admin() {
     { title: "Internship Domain", field: "internshipDomain" },
     { title: "Start Date", field: "startDate" },
     { title: "End Date", field: "endDate" },
+    { title: "Weeks of Internship", field: "weeksOfInternship" },
     { title: "Industry Guide Name", field: "industryGuide" },
     { title: "Industry Guide Email", field: "emailOfIndustryGuide" },
     { title: "Industry Guide No.", field: "noOfIndustryGuide" },
@@ -465,7 +465,6 @@ function Admin() {
                 tooltip: "Download",
                 onClick: (event, rowData) => {
                   DownloadFile(rowData);
-                  // deleteInternship(rowData.usn);
                 },
               },
             ]}
