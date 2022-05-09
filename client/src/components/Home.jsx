@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import banner from "./gitbanner.png";
+import Loading from "./Loading";
 
 function Home() {
   const [name, setName] = useState("");
@@ -26,6 +27,7 @@ function Home() {
   const [intenshipExtFed, setIntenshipExtFed] = useState();
   const [batches, setBatches] = useState([]);
   const [mentors, setMentors] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     getBatches();
@@ -50,6 +52,7 @@ function Home() {
         const insExtEval = USN + "_" + internshipExtEval.name;
         const insExtFed = USN + "_" + intenshipExtFed.name;
 
+        setIsLoading(true);
         const res = await fetch("http://localhost:5000/api/ims", {
           method: "POST",
           headers: {
@@ -82,6 +85,7 @@ function Home() {
         });
 
         const result = await res.json();
+        setIsLoading(false);
 
         if (res.status === 400 || !result) {
           window.alert(result.message);
@@ -117,7 +121,7 @@ function Home() {
         }
       }
     } catch (err) {
-      console.log(err);
+      window.alert(err.message);
     }
   };
 
@@ -130,6 +134,7 @@ function Home() {
       formData.append("Intenship_External_Fedback", intenshipExtFed);
       formData.append("usn", usn.toUpperCase());
 
+      setIsLoading(true);
       const response = await fetch("http://localhost:5000/api/uploads", {
         method: "POST",
         headers: {
@@ -139,6 +144,7 @@ function Home() {
       });
 
       const result = await response.json();
+      setIsLoading(false);
 
       if (!result || response.status === 500) {
         window.alert(result.message);
@@ -146,42 +152,55 @@ function Home() {
         window.alert(result.message);
       }
     } catch (err) {
-      console.log(err);
+      window.alert(err.message);
     }
   };
 
   const getBatches = async () => {
-    const response = await fetch("http://localhost:5000/api/getBatches", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const result = await response.json();
-    if (response.status === 500 || !result) {
-      window.alert(result.message);
-    } else {
-      setBatches(result.message);
+    try {
+      setIsLoading(true);
+      const response = await fetch("http://localhost:5000/api/getBatches", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const result = await response.json();
+      setIsLoading(false);
+      if (response.status === 500 || !result) {
+        window.alert(result.message);
+      } else {
+        setBatches(result.message);
+      }
+    } catch (err) {
+      window.alert(err.message);
     }
   };
 
   const getMentors = async () => {
-    const response = await fetch("http://localhost:5000/api/getMentors", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const result = await response.json();
-    if (!result) {
-      window.alert("Something went wrong please try again");
-    } else {
-      setMentors(result.message);
+    try {
+      setIsLoading(true);
+      const response = await fetch("http://localhost:5000/api/getMentors", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const result = await response.json();
+      setIsLoading(false);
+      if (!result) {
+        window.alert("Something went wrong please try again");
+      } else {
+        setMentors(result.message);
+      }
+    } catch (err) {
+      window.alert(err.message);
     }
   };
 
   return (
     <div>
+      {isLoading ? <Loading /> : ""}
       <nav>
         <img src={banner} alt="Banner" className="git-banner" />
         <h1>KLS Gogte Institute of Technology</h1>
