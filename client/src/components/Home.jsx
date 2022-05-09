@@ -167,13 +167,13 @@ function Home() {
       });
       const result = await response.json();
       setIsLoading(false);
-      if (response.status === 500 || !result) {
-        window.alert(result.message);
+      if (!result.message || result.error) {
+        window.alert("Something went wrong please try again");
       } else {
         setBatches(result.message);
       }
-    } catch (err) {
-      window.alert(err.message);
+    } catch (error) {
+      window.alert(error.message);
     }
   };
 
@@ -188,13 +188,13 @@ function Home() {
       });
       const result = await response.json();
       setIsLoading(false);
-      if (!result) {
+      if (!result.message || result.error) {
         window.alert("Something went wrong please try again");
       } else {
         setMentors(result.message);
       }
-    } catch (err) {
-      window.alert(err.message);
+    } catch (error) {
+      window.alert(error.message);
     }
   };
 
