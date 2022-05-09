@@ -47,15 +47,78 @@ function Admin() {
     e.preventDefault();
 
     if (deleteFilter === "USN") {
-      console.log(deleteUsn);
+      DeleteUserByUSN(deleteUsn);
     } else if (deleteFilter === "Batch") {
-      console.log(deleteBatch);
+      DeleteUserByBatch(deleteBatch);
     } else if (deleteFilter === "Mentor") {
-      console.log(deleteMentor);
+      DeleteUserByMentor(deleteMentor);
     }
 
     setDeleteFilter("USN");
     setDeleteUsn("");
+  };
+
+  const DeleteUserByUSN = async (deleteUsn) => {
+    const response = await fetch("http://localhost:5000/api/deleteUserByUSN", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        deleteUsn,
+      }),
+    });
+    const data = await response.json();
+
+    if (!data.message) {
+      window.alert("Something went wrong please try again");
+    } else {
+      window.alert(data.message);
+    }
+  };
+
+  const DeleteUserByBatch = async (deleteBatch) => {
+    const response = await fetch(
+      "http://localhost:5000/api/deleteUsersByBatch",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          deleteBatch,
+        }),
+      }
+    );
+    const data = await response.json();
+
+    if (!data.message) {
+      window.alert("Something went wrong please try again");
+    } else {
+      window.alert(data.message);
+    }
+  };
+
+  const DeleteUserByMentor = async (deleteMentor) => {
+    const response = await fetch(
+      "http://localhost:5000/api/deleteUsersByMentor",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          deleteMentor,
+        }),
+      }
+    );
+    const data = await response.json();
+
+    if (!data.message) {
+      window.alert("Something went wrong please try again");
+    } else {
+      window.alert(data.message);
+    }
   };
 
   const DeleteMentor = async () => {
@@ -74,7 +137,7 @@ function Admin() {
     if (!result.message) {
       window.alert("Something went wrong please try again");
     } else {
-      window.alert("Mentor Deleted Successfully");
+      window.alert(result.message);
       getMentors();
     }
   };
@@ -95,7 +158,7 @@ function Admin() {
     if (!result.message) {
       window.alert("Something went wrong please try again");
     } else {
-      window.alert("Batch Deleted Successfully");
+      window.alert(result.message);
       getBatches();
     }
   };
@@ -402,7 +465,6 @@ function Admin() {
                 Batch:
                 <select
                   className="input-col"
-                  defaultValue={batches[0].batch}
                   value={batch}
                   onChange={(e) => setBatch(e.target.value)}
                 >

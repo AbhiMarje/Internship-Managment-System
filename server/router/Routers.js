@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const cors = require("cors");
 const multer = require("multer");
+const fs = require("fs");
+const { promisify } = require("util");
+const unlinkAsync = promisify(fs.unlink);
 
 router.use(cors());
 
@@ -56,6 +59,74 @@ router.post(
     }
   }
 );
+
+router.post("/api/deleteUserByUSN", async (req, res) => {
+  try {
+    await User.findOneAndDelete({ USN: req.body.deleteUsn }, (err, result) => {
+      if (err) {
+        res.status(500).json({ message: "Error Deleting User" });
+      } else {
+        unlinkAsync("../public/uploads/" + result.insCert);
+        unlinkAsync("../public/uploads/" + result.insRep);
+        unlinkAsync("../public/uploads/" + result.insExtEval);
+        unlinkAsync("../public/uploads/" + result.insExtFed);
+        res.status(200).json({ message: "User Deleted Successfully" });
+      }
+    }).clone();
+  } catch (err) {
+    res.status(500).json({ message: "Something went wrong please try again" });
+  }
+});
+
+router.post("/api/deleteUsersByBatch", async (req, res) => {
+  try {
+    await User.find({ batch: req.body.deleteBatch }, (err, result) => {
+      if (err) {
+        res.status(500).json({ message: "Error Deleting Users" });
+      } else {
+        result.forEach(async (user) => {
+          unlinkAsync("../public/uploads/" + user.insCert);
+          unlinkAsync("../public/uploads/" + user.insRep);
+          unlinkAsync("../public/uploads/" + user.insExtEval);
+          unlinkAsync("../public/uploads/" + user.insExtFed);
+          await User.findOneAndDelete({ USN: user.USN }, (err, result) => {
+            if (err) {
+              res.status(500).json({ message: "Error Deleting User" });
+            }
+          }).clone();
+        });
+        res.status(200).json({ message: "Users Deleted Successfully" });
+      }
+    }).clone();
+  } catch (err) {
+    res.status(500).json({ message: "Something went wrong please try again" });
+  }
+});
+
+router.post("/api/deleteUsersByMentor", async (req, res) => {
+  try {
+    await User.find({ mentorName: req.body.deleteMentor }, (err, result) => {
+      if (err) {
+        res.status(500).json({ message: "Error Deleting Users" });
+      } else {
+        result.forEach(async (user) => {
+          unlinkAsync("../public/uploads/" + user.insCert);
+          unlinkAsync("../public/uploads/" + user.insRep);
+          unlinkAsync("../public/uploads/" + user.insExtEval);
+          unlinkAsync("../public/uploads/" + user.insExtFed);
+          await User.findOneAndDelete({ USN: user.USN }, (err, result) => {
+            if (err) {
+              res.status(500).json({ message: "Error Deleting User" });
+            }
+          }).clone();
+        });
+        res.status(200).json({ message: "Users Deleted Successfully" });
+      }
+    }).clone();
+  } catch (err) {
+    res.status(500).json({ message: "Something went wrong please try again" });
+  }
+});
 
 router.post("/api/deleteMentor", async (req, res) => {
   const { mentor } = req.body;
