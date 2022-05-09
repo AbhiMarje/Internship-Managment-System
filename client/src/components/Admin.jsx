@@ -209,7 +209,7 @@ function Admin() {
       });
       const result = await response.json();
       setIsLoading(false);
-      if (!result) {
+      if (!result.message || result.error) {
         window.alert("Something went wrong please try again");
       } else {
         setBatches(result.message);
@@ -230,7 +230,7 @@ function Admin() {
       });
       const result = await response.json();
       setIsLoading(false);
-      if (!result) {
+      if (!result.message || result.error) {
         window.alert("Something went wrong please try again");
       } else {
         setMentors(result.message);

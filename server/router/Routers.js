@@ -4,7 +4,7 @@ const cors = require("cors");
 const multer = require("multer");
 const fs = require("fs");
 const { promisify } = require("util");
-const unlinkAsync = promisify(fs.unlink);
+const unlinkAsync = promisify(fs.unlinkSync);
 
 router.use(cors());
 
@@ -135,7 +135,7 @@ router.post("/api/deleteMentor", async (req, res) => {
       if (err) {
         res.status(500).json({ message: "Error deleting mentor" });
       } else {
-        res.status(200).json({ message: data });
+        res.status(200).json({ message: "Mentor Deleted Successfully" });
       }
     }).clone();
   } catch (err) {
@@ -150,7 +150,7 @@ router.post("/api/deleteBatch", async (req, res) => {
       if (err) {
         res.status(500).json({ message: "Error deleting batch" });
       } else {
-        res.status(200).json({ message: data });
+        res.status(200).json({ message: "Batch Deleted Successfully" });
       }
     }).clone();
   } catch (err) {
@@ -175,13 +175,13 @@ router.get("/api/getMentors", async (req, res) => {
   try {
     await Mentors.find({}, (err, mentors) => {
       if (err) {
-        res.status(500).json({ message: "Error getting mentors" });
+        res.status(500).json({ message: null, error: "Error getting Mentors" });
       } else {
         res.status(200).json({ message: mentors });
       }
     }).clone();
   } catch (err) {
-    res.json({ message: "Something went wrong please try again" });
+    res.json({ message: null, error: "Something went wrong please try again" });
   }
 });
 
@@ -189,13 +189,13 @@ router.get("/api/getBatches", async (req, res) => {
   try {
     await Batch.find({}, (err, batches) => {
       if (err) {
-        res.status(500).json({ message: "Error getting batches" });
+        res.status(500).json({ message: null, error: "Error getting Batches" });
       } else if (batches) {
         res.status(200).json({ message: batches });
       }
     }).clone();
   } catch (err) {
-    res.json({ message: "Something went wrong please try again" });
+    res.json({ message: null, error: "Something went wrong please try again" });
   }
 });
 
