@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import banner from "./gitbanner.png";
 import MaterialTable from "@material-table/core";
 import { ExportPdf, ExportCsv } from "@material-table/exporters";
 import download from "downloadjs";
 import Loading from "./Loading";
+import userContext from "./UserContext";
+import { useNavigate } from "react-router-dom";
 
 function Admin() {
+  const { user } = useContext(userContext);
   const [data, setData] = useState([]);
   const [filter, setFilter] = useState("USN");
   const [deleteFilter, setDeleteFilter] = useState("USN");
@@ -18,11 +21,16 @@ function Admin() {
   const [batches, setBatches] = useState([]);
   const [mentors, setMentors] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+
     getBatches();
     getMentors();
-  }, []);
+  }, [user, navigate]);
 
   const HandleFilter = (e) => {
     e.preventDefault();

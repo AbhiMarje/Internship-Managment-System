@@ -60,21 +60,53 @@ router.post(
   }
 );
 
-router.post("/api/deleteUserByUSN", async (req, res) => {
+router.post("/api/login", (req, res) => {
   try {
-    await User.findOneAndDelete({ USN: req.body.deleteUsn }, (err, result) => {
-      if (err) {
-        res.status(500).json({ message: "Error Deleting User" });
+    const { username, password } = req.body;
+    if (username && password) {
+      if (username === "ims_git" && password === "ims_git@678") {
+        res.status(200).json({ message: "Login Successful" });
       } else {
-        unlinkAsync("../public/uploads/" + result.insCert);
-        unlinkAsync("../public/uploads/" + result.insRep);
-        unlinkAsync("../public/uploads/" + result.insExtEval);
-        unlinkAsync("../public/uploads/" + result.insExtFed);
-        res.status(200).json({ message: "User Deleted Successfully" });
+        res.status(400).json({ message: "Invalid Credentials" });
       }
-    }).clone();
+    } else {
+      return res.status(400).json({ message: "Invalid Credentials" });
+    }
   } catch (err) {
-    res.status(500).json({ message: "Something went wrong please try again" });
+    res.status(400).json({ message: "Something went wrong please try again" });
+  }
+});
+
+router.post("/api/deleteUserByUSN", (req, res) => {
+  try {
+    const { deleteUsn } = req.body;
+    if (deleteUsn) {
+      User.findOne({ deleteUsn }, (err, user) => {
+        if (err) {
+          res.status(400).json({ message: "Something went wrong" });
+        } else {
+          if (user) {
+            unlinkAsync("../public/uploads/" + user.insCert);
+            unlinkAsync("../public/uploads/" + user.insRep);
+            unlinkAsync("../public/uploads/" + user.insExtEval);
+            unlinkAsync("../public/uploads/" + user.insExtFed);
+            User.deleteOne({ deleteUsn }, (err, user) => {
+              if (err) {
+                res.status(400).json({ message: "Something went wrong" });
+              } else {
+                res.status(200).json({ message: "User deleted successfully" });
+              }
+            });
+          } else {
+            res.status(400).json({ message: "User not found" });
+          }
+        }
+      });
+    } else {
+      res.status(400).json({ message: "Invalid Credentials" });
+    }
+  } catch (err) {
+    res.status(400).json({ message: "Something went wrong please try again" });
   }
 });
 

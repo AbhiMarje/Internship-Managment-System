@@ -1,15 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import banner from "./gitbanner.png";
+import userContext from "./UserContext";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { setUser } = useContext(userContext);
+  const navigate = useNavigate();
 
-  const HandleSubmit = (e) => {
+  const HandleSubmit = async (e) => {
     e.preventDefault();
-    alert(`${username} ${password}`);
+    await AunthenticateUser(username, password);
     setUsername("");
     setPassword("");
+  };
+
+  const AunthenticateUser = async (username, password) => {
+    try {
+      const response = await fetch("http://localhost:5000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await response.json();
+
+      if (data.message) {
+        setUser(username);
+        navigate("/admin");
+      } else {
+        window.alert(data.message);
+      }
+    } catch (error) {
+      window.alert(error.message);
+    }
   };
 
   return (
