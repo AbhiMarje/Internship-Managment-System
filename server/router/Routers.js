@@ -23,7 +23,18 @@ var storage = multer.diskStorage({
     cb(null, "../public/uploads");
   },
   filename: (req, file, cb) => {
-    cb(null, req.headers.usn + "_" + file.originalname);
+    const { usn, noofinternships } = req.headers;
+    if (noofinternships === "1st Internship") {
+      cb(null, usn + "_" + "1st" + "_" + file.originalname);
+    } else if (noofinternships === "2nd Internship") {
+      cb(null, usn + "_" + "2nd" + "_" + file.originalname);
+    } else if (noofinternships === "3rd Internship") {
+      cb(null, usn + "_" + "3rd" + "_" + file.originalname);
+    } else if (noofinternships === "4th Internship") {
+      cb(null, usn + "_" + "4th" + "_" + file.originalname);
+    } else if (noofinternships === "5th Internship") {
+      cb(null, usn + "_" + "5th" + "_" + file.originalname);
+    }
   },
 });
 
@@ -64,24 +75,25 @@ router.post("/api/login", (req, res) => {
   try {
     const { username, password } = req.body;
     if (username && password) {
-      if (username === "ims_git" && password === "ims_git@678") {
+      if (username === "ims_git" && password === "ims_git@9678") {
         res.status(200).json({ message: "Login Successful" });
       } else {
-        res.status(400).json({ message: "Invalid Credentials" });
+        res.status(400).json({ error: "Invalid Credentials" });
       }
     } else {
-      return res.status(400).json({ message: "Invalid Credentials" });
+      return res.status(400).json({ error: "Invalid Credentials" });
     }
   } catch (err) {
-    res.status(400).json({ message: "Something went wrong please try again" });
+    res.status(400).json({ error: "Something went wrong please try again" });
   }
 });
 
 router.post("/api/deleteUserByUSN", (req, res) => {
   try {
     const { deleteUsn } = req.body;
+    const usn = deleteUsn.toUpperCase();
     if (deleteUsn) {
-      User.findOne({ deleteUsn }, (err, user) => {
+      User.findOne({ USN: usn }, (err, user) => {
         if (err) {
           res.status(400).json({ message: "Something went wrong" });
         } else {
@@ -90,20 +102,22 @@ router.post("/api/deleteUserByUSN", (req, res) => {
             unlinkAsync("../public/uploads/" + user.insRep);
             unlinkAsync("../public/uploads/" + user.insExtEval);
             unlinkAsync("../public/uploads/" + user.insExtFed);
-            User.deleteOne({ deleteUsn }, (err, user) => {
+            User.findOneAndDelete({ USN: usn }, (err, user) => {
               if (err) {
                 res.status(400).json({ message: "Something went wrong" });
               } else {
                 res.status(200).json({ message: "User deleted successfully" });
               }
-            });
+            }).clone();
           } else {
             res.status(400).json({ message: "User not found" });
           }
         }
-      });
+      }).clone();
     } else {
-      res.status(400).json({ message: "Invalid Credentials" });
+      res
+        .status(400)
+        .json({ message: "Something went wrong please try again" });
     }
   } catch (err) {
     res.status(400).json({ message: "Something went wrong please try again" });
@@ -111,93 +125,133 @@ router.post("/api/deleteUserByUSN", (req, res) => {
 });
 
 router.post("/api/deleteUsersByBatch", async (req, res) => {
-  try {
-    await User.find({ batch: req.body.deleteBatch }, (err, result) => {
-      if (err) {
-        res.status(500).json({ message: "Error Deleting Users" });
-      } else {
-        result.forEach(async (user) => {
-          unlinkAsync("../public/uploads/" + user.insCert);
-          unlinkAsync("../public/uploads/" + user.insRep);
-          unlinkAsync("../public/uploads/" + user.insExtEval);
-          unlinkAsync("../public/uploads/" + user.insExtFed);
-          await User.findOneAndDelete({ USN: user.USN }, (err, result) => {
-            if (err) {
-              res.status(500).json({ message: "Error Deleting User" });
-            }
-          }).clone();
-        });
-        res.status(200).json({ message: "Users Deleted Successfully" });
-      }
-    }).clone();
-  } catch (err) {
-    res.status(500).json({ message: "Something went wrong please try again" });
+  const { deleteBatch } = req.body;
+  if (deleteBatch) {
+    try {
+      await User.find({ batch: deleteBatch }, (err, result) => {
+        if (err) {
+          res.status(500).json({ message: "Error Deleting Users" });
+        } else {
+          if (result.length > 0) {
+            result.forEach(async (user) => {
+              unlinkAsync("../public/uploads/" + user.insCert);
+              unlinkAsync("../public/uploads/" + user.insRep);
+              unlinkAsync("../public/uploads/" + user.insExtEval);
+              unlinkAsync("../public/uploads/" + user.insExtFed);
+              await User.findOneAndDelete({ USN: user.USN }, (err, result) => {
+                if (err) {
+                  res.status(500).json({ message: "Error Deleting User" });
+                }
+              }).clone();
+            });
+            res.status(200).json({ message: "Users Deleted Successfully" });
+          } else {
+            res.status(400).json({ message: "No Users Found" });
+          }
+        }
+      }).clone();
+    } catch (err) {
+      res
+        .status(500)
+        .json({ message: "Something went wrong please try again" });
+    }
+  } else {
+    res.status(400).json({ message: "Something went wrong please try again" });
   }
 });
 
 router.post("/api/deleteUsersByMentor", async (req, res) => {
-  try {
-    await User.find({ mentorName: req.body.deleteMentor }, (err, result) => {
-      if (err) {
-        res.status(500).json({ message: "Error Deleting Users" });
-      } else {
-        result.forEach(async (user) => {
-          unlinkAsync("../public/uploads/" + user.insCert);
-          unlinkAsync("../public/uploads/" + user.insRep);
-          unlinkAsync("../public/uploads/" + user.insExtEval);
-          unlinkAsync("../public/uploads/" + user.insExtFed);
-          await User.findOneAndDelete({ USN: user.USN }, (err, result) => {
-            if (err) {
-              res.status(500).json({ message: "Error Deleting User" });
-            }
-          }).clone();
-        });
-        res.status(200).json({ message: "Users Deleted Successfully" });
-      }
-    }).clone();
-  } catch (err) {
-    res.status(500).json({ message: "Something went wrong please try again" });
+  const { deleteMentor } = req.body;
+  if (deleteMentor) {
+    try {
+      await User.find({ mentorName: deleteMentor }, (err, result) => {
+        if (err) {
+          res.status(500).json({ message: "Error Deleting Users" });
+        } else {
+          if (result.length > 0) {
+            result.forEach(async (user) => {
+              unlinkAsync("../public/uploads/" + user.insCert);
+              unlinkAsync("../public/uploads/" + user.insRep);
+              unlinkAsync("../public/uploads/" + user.insExtEval);
+              unlinkAsync("../public/uploads/" + user.insExtFed);
+              await User.findOneAndDelete({ USN: user.USN }, (err, result) => {
+                if (err) {
+                  res.status(500).json({ message: "Error Deleting User" });
+                }
+              }).clone();
+            });
+            res.status(200).json({ message: "Users Deleted Successfully" });
+          } else {
+            res.status(400).json({ message: "No Users Found" });
+          }
+        }
+      }).clone();
+    } catch (err) {
+      res
+        .status(500)
+        .json({ message: "Something went wrong please try again" });
+    }
+  } else {
+    res.status(400).json({ message: "Something went wrong please try again" });
   }
 });
 
 router.post("/api/deleteMentor", async (req, res) => {
   const { mentor } = req.body;
-  try {
-    await Mentors.findOneAndDelete({ mentor: mentor }, (err, data) => {
-      if (err) {
-        res.status(500).json({ message: "Error deleting mentor" });
-      } else {
-        res.status(200).json({ message: "Mentor Deleted Successfully" });
-      }
-    }).clone();
-  } catch (err) {
-    res.json({ message: "Something went wrong please try again" });
+  if (mentor) {
+    try {
+      await Mentors.findOneAndDelete({ mentor: mentor }, (err, data) => {
+        if (err) {
+          res.status(500).json({ message: "Error deleting mentor" });
+        } else if (!data) {
+          res.status(500).json({ message: "Mentor not found" });
+        } else {
+          res.status(200).json({ message: "Mentor Deleted Successfully" });
+        }
+      }).clone();
+    } catch (err) {
+      res.json({ message: "Something went wrong please try again" });
+    }
+  } else {
+    res.status(400).json({ message: "Something went wrong please try again" });
   }
 });
 
 router.post("/api/deleteBatch", async (req, res) => {
   const { batch } = req.body;
-  try {
-    await Batch.findOneAndDelete({ batch: batch }, (err, data) => {
-      if (err) {
-        res.status(500).json({ message: "Error deleting batch" });
-      } else {
-        res.status(200).json({ message: "Batch Deleted Successfully" });
-      }
-    }).clone();
-  } catch (err) {
-    res.json({ message: "Something went wrong please try again" });
+  if (batch) {
+    try {
+      await Batch.findOneAndDelete({ batch: batch }, (err, data) => {
+        if (err) {
+          res.status(500).json({ message: "Error deleting batch" });
+        } else if (!data) {
+          res.status(500).json({ message: "Batch not found" });
+        } else {
+          res.status(200).json({ message: "Batch Deleted Successfully" });
+        }
+      }).clone();
+    } catch (err) {
+      res.json({ message: "Something went wrong please try again" });
+    }
+  } else {
+    res.status(400).json({ message: "Something went wrong please try again" });
   }
 });
 
 router.post("/api/addNewMentor", async (req, res) => {
   try {
     const { mentor } = req.body;
-    const newMentor = new Mentors({
-      mentor,
-    });
-    await newMentor.save();
-    res.status(200).json({ message: "Mentor added successfully" });
+    if (mentor) {
+      const newMentor = new Mentors({
+        mentor,
+      });
+      await newMentor.save();
+      res.status(200).json({ message: "Mentor added successfully" });
+    } else {
+      res
+        .status(400)
+        .json({ message: "Something went wrong please try again" });
+    }
   } catch (err) {
     res.json({ message: "Something went wrong please try again" });
   }
@@ -234,11 +288,17 @@ router.get("/api/getBatches", async (req, res) => {
 router.post("/api/addNewBatch", async (req, res) => {
   try {
     const { batch } = req.body;
-    const newBatch = new Batch({
-      batch,
-    });
-    await newBatch.save();
-    res.status(200).json({ message: "Batch added successfully" });
+    if (batch) {
+      const newBatch = new Batch({
+        batch,
+      });
+      await newBatch.save();
+      res.status(200).json({ message: "Batch added successfully" });
+    } else {
+      res
+        .status(500)
+        .json({ message: "Something went wrong please try again" });
+    }
   } catch (err) {
     res.json({ message: "Something went wrong please try again" });
   }
@@ -263,15 +323,19 @@ router.get("/api/getAllData", async (req, res) => {
 router.post("/api/getDataByUSN", async (req, res) => {
   try {
     const { usn } = req.body;
-    await User.find({ usn: usn }, (err, data) => {
-      if (err) {
-        res.status(500).json({ message: "Error getting data" });
-      } else if (data.length === 0) {
-        res.status(200).json({ message: null, error: "No data found" });
-      } else {
-        res.status(200).json({ message: data });
-      }
-    }).clone();
+    if (usn) {
+      await User.find({ usn: usn }, (err, data) => {
+        if (err) {
+          res.status(500).json({ message: "Error getting data" });
+        } else if (data.length === 0) {
+          res.status(200).json({ message: null, error: "No data found" });
+        } else {
+          res.status(200).json({ message: data });
+        }
+      }).clone();
+    } else {
+      res.status(500).json({ message: "Error getting data" });
+    }
   } catch (err) {
     res.json({ message: "Something went wrong please try again" });
   }
@@ -280,15 +344,19 @@ router.post("/api/getDataByUSN", async (req, res) => {
 router.post("/api/getDataByBatch", async (req, res) => {
   try {
     const { batch } = req.body;
-    await User.find({ batch: batch }, (err, data) => {
-      if (err) {
-        res.status(500).json({ message: "Error getting data" });
-      } else if (data.length === 0) {
-        res.status(200).json({ message: null, error: "No data found" });
-      } else {
-        res.status(200).json({ message: data });
-      }
-    }).clone();
+    if (batch) {
+      await User.find({ batch: batch }, (err, data) => {
+        if (err) {
+          res.status(500).json({ message: "Error getting data" });
+        } else if (data.length === 0) {
+          res.status(200).json({ message: null, error: "No data found" });
+        } else {
+          res.status(200).json({ message: data });
+        }
+      }).clone();
+    } else {
+      res.status(500).json({ message: "Error getting data" });
+    }
   } catch (err) {
     res.json({ message: "Something went wrong please try again" });
   }
@@ -297,15 +365,19 @@ router.post("/api/getDataByBatch", async (req, res) => {
 router.post("/api/getDataByMentor", async (req, res) => {
   try {
     const { mentor } = req.body;
-    await User.find({ mentorName: mentor }, (err, data) => {
-      if (err) {
-        res.status(500).json({ message: "Error getting data" });
-      } else if (data.length === 0) {
-        res.status(200).json({ message: null, error: "No data found" });
-      } else {
-        res.status(200).json({ message: data });
-      }
-    }).clone();
+    if (mentor) {
+      await User.find({ mentorName: mentor }, (err, data) => {
+        if (err) {
+          res.status(500).json({ message: "Error getting data" });
+        } else if (data.length === 0) {
+          res.status(200).json({ message: null, error: "No data found" });
+        } else {
+          res.status(200).json({ message: data });
+        }
+      }).clone();
+    } else {
+      res.status(500).json({ message: "Error getting data" });
+    }
   } catch (err) {
     res.json({ message: "Something went wrong please try again" });
   }
@@ -324,6 +396,7 @@ router.post("/api/ims", async (req, res) => {
       startDate,
       endDate,
       weeksOfInternship,
+      noOfMonths,
       industryGuide,
       emailOfIndustryGuide,
       noOfIndustryGuide,
@@ -349,6 +422,7 @@ router.post("/api/ims", async (req, res) => {
       !startDate ||
       !endDate ||
       !weeksOfInternship ||
+      !noOfMonths ||
       !industryGuide ||
       !emailOfIndustryGuide ||
       !noOfIndustryGuide ||
@@ -375,6 +449,7 @@ router.post("/api/ims", async (req, res) => {
         startDate,
         endDate,
         weeksOfInternship,
+        noOfMonths,
         industryGuide,
         emailOfIndustryGuide,
         noOfIndustryGuide,

@@ -47,10 +47,33 @@ function Home() {
         window.alert("Please fill all the fields");
       } else {
         const USN = usn.toUpperCase();
-        const insCert = USN + "_" + internshipCert.name;
-        const insRep = USN + "_" + internshipReport.name;
-        const insExtEval = USN + "_" + internshipExtEval.name;
-        const insExtFed = USN + "_" + intenshipExtFed.name;
+        let internshipNo;
+        if (noOfInternship === "1st Internship") {
+          internshipNo = "1st";
+        } else if (noOfInternship === "2nd Internship") {
+          internshipNo = "2nd";
+        } else if (noOfInternship === "3rd Internship") {
+          internshipNo = "3rd";
+        } else if (noOfInternship === "4th Internship") {
+          internshipNo = "4th";
+        } else if (noOfInternship === "5th Internship") {
+          internshipNo = "5th";
+        }
+        const insCert = USN + "_" + internshipNo + "_" + internshipCert.name;
+        const insRep = USN + "_" + internshipNo + "_" + internshipReport.name;
+        const insExtEval =
+          USN + "_" + internshipNo + "_" + internshipExtEval.name;
+        const insExtFed = USN + "_" + internshipNo + "_" + intenshipExtFed.name;
+
+        const date1 = startDate.split("-");
+        const date2 = endDate.split("-");
+
+        const sD = new Date(date1[0], date1[1], date1[2]);
+        const eD = new Date(date2[0], date2[1], date2[2]);
+
+        const diff = Math.round((eD - sD) / (1000 * 60 * 60 * 24));
+
+        const noOfMonths = Math.floor(diff / 30);
 
         setIsLoading(true);
         const res = await fetch("http://localhost:5000/api/ims", {
@@ -69,6 +92,7 @@ function Home() {
             startDate,
             endDate,
             weeksOfInternship,
+            noOfMonths,
             industryGuide,
             emailOfIndustryGuide,
             noOfIndustryGuide,
@@ -139,6 +163,7 @@ function Home() {
         method: "POST",
         headers: {
           usn: usn.toUpperCase(),
+          noofinternships: noOfInternship,
         },
         body: formData,
       });
@@ -209,6 +234,8 @@ function Home() {
         <div className="form-container">
           <form id="student-form" onSubmit={HandleSubmit}>
             <div className="row">
+              <h2>Student Details:</h2>
+              <div className="divider"></div>
               <label className="column">
                 Enter your Name:
                 <input
@@ -245,6 +272,23 @@ function Home() {
                 </select>
               </label>
               <label className="column">
+                KLS GIT Internal Guide (Mentor):
+                <select
+                  className="input-col"
+                  value={mentorName}
+                  onChange={(e) => setMentorName(e.target.value)}
+                >
+                  <option>Select Your Mentor</option>
+                  {mentors.map((mentor, i) => (
+                    <option key={i} value={mentor.mentor}>
+                      {mentor.mentor}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <h2>Internship Details:</h2>
+              <div className="divider"></div>
+              <label className="column">
                 No. of Internship:
                 <select
                   className="input-col"
@@ -255,7 +299,7 @@ function Home() {
                   <option value="2nd Internship">2nd Internship</option>
                   <option value="3rd Internship">3rd Internship</option>
                   <option value="4th Internship">4th Internship</option>
-                  <option value="5ht Internship">5th Internship</option>
+                  <option value="5th Internship">5th Internship</option>
                 </select>
               </label>
               <label className="column">
@@ -407,21 +451,8 @@ function Home() {
                   <option value="Blended">Blended</option>
                 </select>
               </label>
-              <label className="column">
-                KLS GIT Internal Guide (Mentor):
-                <select
-                  className="input-col"
-                  value={mentorName}
-                  onChange={(e) => setMentorName(e.target.value)}
-                >
-                  <option>Select Your Mentor</option>
-                  {mentors.map((mentor, i) => (
-                    <option key={i} value={mentor.mentor}>
-                      {mentor.mentor}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <h2>Upload Files:</h2>
+              <div className="divider"></div>
               <label className="column">
                 Internship Certificate:
                 <input

@@ -65,7 +65,6 @@ function Admin() {
     }
 
     setDeleteFilter("USN");
-    setDeleteUsn("");
   };
 
   const DeleteUserByUSN = async (deleteUsn) => {
@@ -85,6 +84,7 @@ function Admin() {
       );
       const data = await response.json();
       setIsLoading(false);
+      setDeleteUsn("");
 
       if (!data.message) {
         window.alert("Something went wrong please try again");
@@ -93,6 +93,7 @@ function Admin() {
       }
     } catch (error) {
       window.alert(error.message);
+      setDeleteUsn("");
     }
   };
 
@@ -463,6 +464,7 @@ function Admin() {
     { title: "Start Date", field: "startDate" },
     { title: "End Date", field: "endDate" },
     { title: "Weeks of Internship", field: "weeksOfInternship" },
+    { title: "Months", field: "noOfMonths" },
     { title: "Industry Guide Name", field: "industryGuide" },
     { title: "Industry Guide Email", field: "emailOfIndustryGuide" },
     { title: "Industry Guide No.", field: "noOfIndustryGuide" },

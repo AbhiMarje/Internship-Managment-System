@@ -41,6 +41,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  noOfMonths: {
+    type: String,
+    required: true,
+  },
   industryGuide: {
     type: String,
     required: true,

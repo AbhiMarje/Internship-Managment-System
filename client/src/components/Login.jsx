@@ -31,7 +31,7 @@ function Login() {
         setUser(username);
         navigate("/admin");
       } else {
-        window.alert(data.message);
+        window.alert(data.error);
       }
     } catch (error) {
       window.alert(error.message);
