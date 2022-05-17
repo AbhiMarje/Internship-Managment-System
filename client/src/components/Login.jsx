@@ -61,7 +61,7 @@ function Login() {
               Password:
               <input
                 className="input-col"
-                type="text"
+                type="password"
                 value={password}
                 placeholder="Password"
                 onChange={(e) => setPassword(e.target.value)}
