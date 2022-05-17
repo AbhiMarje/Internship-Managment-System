@@ -146,6 +146,7 @@ function Home() {
       }
     } catch (err) {
       window.alert(err.message);
+      setIsLoading(false);
     }
   };
 
@@ -178,6 +179,7 @@ function Home() {
       }
     } catch (err) {
       window.alert(err.message);
+      setIsLoading(false);
     }
   };
 
@@ -199,6 +201,7 @@ function Home() {
       }
     } catch (error) {
       window.alert(error.message);
+      setIsLoading(false);
     }
   };
 
@@ -220,6 +223,7 @@ function Home() {
       }
     } catch (error) {
       window.alert(error.message);
+      setIsLoading(false);
     }
   };
 

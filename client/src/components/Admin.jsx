@@ -94,6 +94,7 @@ function Admin() {
     } catch (error) {
       window.alert(error.message);
       setDeleteUsn("");
+      setIsLoading(false);
     }
   };
 
@@ -122,6 +123,7 @@ function Admin() {
       }
     } catch (error) {
       window.alert(error.message);
+      setIsLoading(false);
     }
   };
 
@@ -150,6 +152,7 @@ function Admin() {
       }
     } catch (error) {
       window.alert(error.message);
+      setIsLoading(false);
     }
   };
 
@@ -177,6 +180,7 @@ function Admin() {
       }
     } catch (error) {
       window.alert(error.message);
+      setIsLoading(false);
     }
   };
 
@@ -204,6 +208,7 @@ function Admin() {
       }
     } catch (error) {
       window.alert(error.message);
+      setIsLoading(false);
     }
   };
 
@@ -225,6 +230,7 @@ function Admin() {
       }
     } catch (error) {
       window.alert(error.message);
+      setIsLoading(false);
     }
   };
 
@@ -246,6 +252,7 @@ function Admin() {
       }
     } catch (error) {
       window.alert(error.message);
+      setIsLoading(false);
     }
   };
 
@@ -269,6 +276,7 @@ function Admin() {
       }
     } catch (error) {
       window.alert(error.message);
+      setIsLoading(false);
     }
   };
 
@@ -294,6 +302,7 @@ function Admin() {
       }
     } catch (err) {
       window.alert(err.message);
+      setIsLoading(false);
     }
   };
 
@@ -319,6 +328,7 @@ function Admin() {
       }
     } catch (err) {
       window.alert(err.message);
+      setIsLoading(false);
     }
   };
 
@@ -344,6 +354,7 @@ function Admin() {
       }
     } catch (err) {
       window.alert(err.message);
+      setIsLoading(false);
     }
   };
 
@@ -376,6 +387,7 @@ function Admin() {
         getBatches();
       } catch (err) {
         window.alert(err.message);
+        setIsLoading(false);
       }
     }
   };
@@ -408,6 +420,7 @@ function Admin() {
         getMentors();
       } catch (err) {
         window.alert(err.message);
+        setIsLoading(false);
       }
     }
   };
@@ -450,6 +463,7 @@ function Admin() {
       }
     } catch (err) {
       window.alert(err.message);
+      setIsLoading(false);
     }
   };
 
