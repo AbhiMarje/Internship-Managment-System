@@ -241,6 +241,7 @@ function Home() {
                 <input
                   className="input-col"
                   type="text"
+                  name="name"
                   value={name}
                   placeholder="Your Name"
                   onChange={(e) => setName(e.target.value)}
@@ -251,6 +252,7 @@ function Home() {
                 <input
                   className="input-col"
                   type="text"
+                  name="usn"
                   value={usn}
                   placeholder="Your USN"
                   onChange={(e) => setusn(e.target.value)}
@@ -261,6 +263,7 @@ function Home() {
                 <select
                   className="input-col"
                   value={batch}
+                  name="batch"
                   onChange={(e) => setBatch(e.target.value)}
                 >
                   <option>Select Your Batch</option>
@@ -276,6 +279,7 @@ function Home() {
                 <select
                   className="input-col"
                   value={mentorName}
+                  name="mentorName"
                   onChange={(e) => setMentorName(e.target.value)}
                 >
                   <option>Select Your Mentor</option>
@@ -293,6 +297,7 @@ function Home() {
                 <select
                   className="input-col"
                   value={noOfInternship}
+                  name="noOfInternship"
                   onChange={(e) => setNoOfInternship(e.target.value)}
                 >
                   <option value="1st Internship">1st Internship</option>
@@ -308,6 +313,7 @@ function Home() {
                   className="input-col"
                   type="text"
                   value={nameOfIndustry}
+                  name="nameOfIndustry"
                   placeholder="Name of Industry"
                   onChange={(e) => setNameOfIndustry(e.target.value)}
                 />
@@ -318,6 +324,7 @@ function Home() {
                   className="input-col"
                   type="text"
                   value={AddressOfIndustry}
+                  name="AddressOfIndustry"
                   placeholder="Full Postal Address of Industry"
                   onChange={(e) => setAddressOfIndustry(e.target.value)}
                 />
@@ -327,6 +334,7 @@ function Home() {
                 <select
                   className="input-col"
                   value={internshipDomain}
+                  name="internshipDomain"
                   onChange={(e) => setInternshipDomain(e.target.value)}
                 >
                   <option value="App Development">App Development</option>
@@ -353,6 +361,7 @@ function Home() {
                   className="input-col"
                   type="date"
                   value={startDate}
+                  name="startDate"
                   placeholder="Start date"
                   onChange={(e) => setStartDate(e.target.value)}
                 />
@@ -363,6 +372,7 @@ function Home() {
                   className="input-col"
                   type="date"
                   value={endDate}
+                  name="endDate"
                   placeholder="End Date"
                   onChange={(e) => setEndDate(e.target.value)}
                 />
@@ -373,6 +383,7 @@ function Home() {
                   className="input-col"
                   type="Number"
                   value={weeksOfInternship}
+                  name="weeksOfInternship"
                   placeholder="No. of Weeks"
                   onChange={(e) => setWeeksOfInternship(e.target.value)}
                 />
@@ -383,6 +394,7 @@ function Home() {
                   className="input-col"
                   type="text"
                   value={industryGuide}
+                  name="industryGuide"
                   placeholder="Industry Guide Name"
                   onChange={(e) => setIndustryGuide(e.target.value)}
                 />
@@ -393,6 +405,7 @@ function Home() {
                   className="input-col"
                   type="text"
                   value={emailOfIndustryGuide}
+                  name="emailOfIndustryGuide"
                   placeholder="Email Id of Industry Guide"
                   onChange={(e) => setEmailOfIndustryGuide(e.target.value)}
                 />
@@ -403,6 +416,7 @@ function Home() {
                   className="input-col"
                   type="text"
                   value={noOfIndustryGuide}
+                  name="noOfIndustryGuide"
                   placeholder="Industry Guide Contact No."
                   onChange={(e) => setNoOfIndustryGuide(e.target.value)}
                 />
@@ -412,6 +426,7 @@ function Home() {
                 <select
                   className="input-col"
                   value={stipendReceived}
+                  name="stipendReceived"
                   onChange={(e) => setStipendReceived(e.target.value)}
                 >
                   <option value="Yes">Yes</option>
@@ -424,6 +439,7 @@ function Home() {
                   className="input-col"
                   type="text"
                   value={amountOfStipend}
+                  name="amountOfStipend"
                   placeholder="Stipend in Rupees (Enter 0 if not applicable)"
                   onChange={(e) => setAmountOfStipend(e.target.value)}
                 />
@@ -433,6 +449,7 @@ function Home() {
                 <select
                   className="input-col"
                   value={toBeEval}
+                  name="toBeEval"
                   onChange={(e) => setToBeEval(e.target.value)}
                 >
                   <option value="Yes">Yes</option>
@@ -444,6 +461,7 @@ function Home() {
                 <select
                   className="input-col"
                   value={modeOfInternship}
+                  name="modeOfInternship"
                   onChange={(e) => setModeOfInternship(e.target.value)}
                 >
                   <option value="Online">Online</option>
@@ -458,6 +476,7 @@ function Home() {
                 <input
                   className="input-col"
                   type="file"
+                  name="internshipCertificate"
                   placeholder="Internship Certificate"
                   onChange={(e) => setInternshipCert(e.target.files[0])}
                 />
@@ -467,6 +486,7 @@ function Home() {
                 <input
                   className="input-col"
                   type="file"
+                  name="internshipReport"
                   placeholder="Internship Report"
                   onChange={(e) => setInternshipReport(e.target.files[0])}
                 />
@@ -476,6 +496,7 @@ function Home() {
                 <input
                   className="input-col"
                   type="file"
+                  name="internshipExternalEvaluation"
                   placeholder="Internship External Evaluation"
                   onChange={(e) => setInternshipExtEval(e.target.files[0])}
                 />
@@ -485,6 +506,7 @@ function Home() {
                 <input
                   className="input-col"
                   type="file"
+                  name="internshipExternalFeedback"
                   placeholder="Internship External Feedback"
                   onChange={(e) => setIntenshipExtFed(e.target.files[0])}
                 />
