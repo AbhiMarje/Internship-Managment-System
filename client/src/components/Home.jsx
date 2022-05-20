@@ -73,7 +73,11 @@ function Home() {
 
         const diff = Math.round((eD - sD) / (1000 * 60 * 60 * 24));
 
-        const noOfMonths = Math.floor(diff / 30);
+        let noOfMonths = Math.floor(diff / 30);
+
+        if (noOfMonths === 0) {
+          noOfMonths = "0";
+        }
 
         setIsLoading(true);
         const res = await fetch("http://localhost:5000/api/ims", {
@@ -85,6 +89,7 @@ function Home() {
             name,
             USN,
             batch,
+            mentorName,
             noOfInternship,
             nameOfIndustry,
             AddressOfIndustry,
@@ -100,7 +105,6 @@ function Home() {
             amountOfStipend,
             toBeEval,
             modeOfInternship,
-            mentorName,
             insCert,
             insRep,
             insExtEval,

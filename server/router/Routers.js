@@ -11,6 +11,7 @@ router.use(cors());
 const User = require("../models/userSchema.js");
 const Batch = require("../models/Batch.js");
 const Mentors = require("../models/Mentors.js");
+const Student = require("../models/Student.js");
 
 router.post("/api/download", (req, res) => {
   const { filename } = req.body;
@@ -88,12 +89,65 @@ router.post("/api/login", (req, res) => {
   }
 });
 
-router.post("/api/deleteUserByUSN", (req, res) => {
+router.post("/api/deleteStudentByUSN", async (req, res) => {
+  try {
+    const { studentDeleteUsn } = req.body;
+    if (studentDeleteUsn) {
+      await Student.findOne({ USN: studentDeleteUsn }, async (err, data) => {
+        if (err) {
+          return res.status(400).json({ error: "Something went wrong" });
+        } else {
+          if (data) {
+            await Student.findOneAndDelete(
+              { USN: studentDeleteUsn },
+              (err, doc) => {
+                if (err) {
+                  return res
+                    .status(400)
+                    .json({ error: "Something went wrong" });
+                } else {
+                  res
+                    .status(200)
+                    .json({ message: "User deleted successfully" });
+                }
+              }
+            ).clone();
+          }
+        }
+      });
+    } else {
+      res.status(400).json({ message: "User not found" });
+    }
+  } catch (err) {
+    res.status(400).json({ message: "Something went wrong please try again" });
+  }
+});
+
+router.post("/api/deleteStudentByBatch", async (req, res) => {
+  try {
+    const { studentDeleteBatch } = req.body;
+    if (studentDeleteBatch) {
+      await Student.deleteMany({ Batch: studentDeleteBatch }, (err, doc) => {
+        if (err) {
+          return res.status(400).json({ error: "Something went wrong" });
+        } else {
+          res.status(200).json({ message: "Users deleted successfully" });
+        }
+      }).clone();
+    } else {
+      res.status(400).json({ message: "Users not found" });
+    }
+  } catch (err) {
+    res.status(400).json({ message: "Something went wrong please try again" });
+  }
+});
+
+router.post("/api/deleteUserByUSN", async (req, res) => {
   try {
     const { deleteUsn } = req.body;
     const usn = deleteUsn.toUpperCase();
     if (deleteUsn) {
-      User.findOne({ USN: usn }, (err, user) => {
+      await User.findOne({ USN: usn }, async (err, user) => {
         if (err) {
           res.status(400).json({ message: "Something went wrong" });
         } else {
@@ -102,7 +156,7 @@ router.post("/api/deleteUserByUSN", (req, res) => {
             unlinkAsync("../public/uploads/" + user.insRep);
             unlinkAsync("../public/uploads/" + user.insExtEval);
             unlinkAsync("../public/uploads/" + user.insExtFed);
-            User.findOneAndDelete({ USN: usn }, (err, user) => {
+            await User.findOneAndDelete({ USN: usn }, (err, user) => {
               if (err) {
                 res.status(400).json({ message: "Something went wrong" });
               } else {
@@ -304,6 +358,27 @@ router.post("/api/addNewBatch", async (req, res) => {
   }
 });
 
+router.post("/api/getStudentsWithNoInternship", async (req, res) => {
+  try {
+    const { loadBatch } = req.body;
+    if (loadBatch) {
+      await Student.find({ Batch: loadBatch }, (err, students) => {
+        if (err) {
+          res
+            .status(500)
+            .json({ message: null, error: "Error getting Students" });
+        } else if (students) {
+          res.status(200).json({ message: students });
+        }
+      }).clone();
+    } else {
+      res.status(500).json({ message: "Error getting data" });
+    }
+  } catch (err) {
+    res.json({ message: null, error: "Something went wrong please try again" });
+  }
+});
+
 router.get("/api/getAllData", async (req, res) => {
   try {
     await User.find({}, (err, data) => {
@@ -325,6 +400,27 @@ router.post("/api/getDataByUSN", async (req, res) => {
     const { usn } = req.body;
     if (usn) {
       await User.find({ usn: usn }, (err, data) => {
+        if (err) {
+          res.status(500).json({ message: "Error getting data" });
+        } else if (data.length === 0) {
+          res.status(200).json({ message: null, error: "No data found" });
+        } else {
+          res.status(200).json({ message: data });
+        }
+      }).clone();
+    } else {
+      res.status(500).json({ message: "Error getting data" });
+    }
+  } catch (err) {
+    res.json({ message: "Something went wrong please try again" });
+  }
+});
+
+router.post("/api/getAllCompanyList", async (req, res) => {
+  try {
+    const { batch } = req.body;
+    if (batch) {
+      await User.find({ batch: batch }, (err, data) => {
         if (err) {
           res.status(500).json({ message: "Error getting data" });
         } else if (data.length === 0) {
@@ -383,12 +479,36 @@ router.post("/api/getDataByMentor", async (req, res) => {
   }
 });
 
+router.post("/api/uploadStudentData", async (req, res) => {
+  try {
+    const { studentjsonData } = req.body;
+    if (studentjsonData) {
+      studentjsonData.forEach(async (student) => {
+        const newStudent = new Student({
+          USN: student.USN,
+          Name: student.Name,
+          Batch: student.Batch,
+        });
+        await newStudent.save();
+      });
+      res.status(200).json({ message: "Data uploaded successfully" });
+    } else {
+      res.status(500).json({ error: "Error uploading data" });
+    }
+  } catch (err) {
+    res.json({ error: "Something went wrong please try again" });
+  }
+});
+
+var isDeleted = "false";
+
 router.post("/api/ims", async (req, res) => {
   try {
     const {
       name,
       USN,
       batch,
+      mentorName,
       noOfInternship,
       nameOfIndustry,
       AddressOfIndustry,
@@ -404,7 +524,6 @@ router.post("/api/ims", async (req, res) => {
       amountOfStipend,
       toBeEval,
       modeOfInternship,
-      mentorName,
       insCert,
       insRep,
       insExtEval,
@@ -442,6 +561,7 @@ router.post("/api/ims", async (req, res) => {
         name,
         USN,
         batch,
+        mentorName,
         noOfInternship,
         nameOfIndustry,
         AddressOfIndustry,
@@ -457,7 +577,6 @@ router.post("/api/ims", async (req, res) => {
         amountOfStipend,
         toBeEval,
         modeOfInternship,
-        mentorName,
         insCert,
         insRep,
         insExtEval,
@@ -466,11 +585,30 @@ router.post("/api/ims", async (req, res) => {
 
       await user.save();
 
+      const result = await deleteUser(USN);
+
+      console.log(result);
+
       res.status(200).json({ message: "Submiited Successfully" });
     }
   } catch (err) {
     res.json({ message: "Something went wrong please try again" });
   }
 });
+
+async function deleteUser(USN) {
+  try {
+    await Student.findOneAndDelete({ USN: USN }, (err, data) => {
+      if (err) {
+        isDeleted = "false";
+      } else {
+        isDeleted = "true";
+      }
+    }).clone();
+  } catch (err) {
+    isDeleted = "false";
+  }
+  return isDeleted;
+}
 
 module.exports = router;

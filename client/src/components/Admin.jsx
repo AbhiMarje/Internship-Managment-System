@@ -6,6 +6,7 @@ import download from "downloadjs";
 import Loading from "./Loading";
 import userContext from "./UserContext";
 import { useNavigate } from "react-router-dom";
+import * as XLSX from "xlsx/xlsx.mjs";
 
 function Admin() {
   const { user } = useContext(userContext);
@@ -21,6 +22,14 @@ function Admin() {
   const [batches, setBatches] = useState([]);
   const [mentors, setMentors] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadFilter, setLoadFilter] = useState("UploadData");
+  const [studentFile, setStudentFile] = useState();
+  const [loadBatch, setLoadBatch] = useState();
+  const [studentData, setStudentData] = useState([]);
+  const [studentjsonData, setStudentJsonData] = useState([]);
+  const [studentDeleteFilter, setStudentDeleteFilter] = useState("USN");
+  const [studentDeleteUsn, setStudentDeleteUsn] = useState("");
+  const [studentDeleteBatch, setStudentDeleteBatch] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,6 +40,47 @@ function Admin() {
     getBatches();
     getMentors();
   }, [user, navigate]);
+
+  const convertToJSON = (header, data) => {
+    const jsonData = [];
+    data.forEach((row) => {
+      row.push(loadBatch);
+    });
+    data.forEach((row) => {
+      let rowData = {};
+      row.forEach((element, i) => {
+        if (i === 2) {
+          rowData["Batch"] = element.trim();
+        } else if (i === 1) {
+          rowData[header[i]] = element.toUpperCase().trim();
+        } else {
+          rowData[header[i]] = element.trim();
+        }
+      });
+      jsonData.push(rowData);
+    });
+    setStudentJsonData(jsonData);
+  };
+
+  const ImportExcel = (e) => {
+    const file = studentFile;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const data = event.target.result;
+      const workbook = XLSX.read(data, {
+        type: "binary",
+      });
+      const first_sheet_name = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[first_sheet_name];
+      const fileData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+      const headers = fileData[0];
+      fileData.splice(0, 1);
+      convertToJSON(headers, fileData);
+      setStudentData(studentjsonData);
+    };
+
+    reader.readAsBinaryString(file);
+  };
 
   const HandleFilter = (e) => {
     e.preventDefault();
@@ -47,10 +97,39 @@ function Admin() {
       fetchDataByMentor();
     } else if (filter === "All") {
       fetchAllData();
+    } else if (filter === "Companies") {
+      fetchAllCompanyList();
     }
 
-    setFilter("USN");
     setusn("");
+  };
+
+  const HandleSubmit = (e) => {
+    e.preventDefault();
+
+    if (loadFilter === "UploadData") {
+      if (studentFile && loadBatch) {
+        ImportExcel();
+      } else {
+        window.alert("Please fill all the fields");
+      }
+    } else if (loadFilter === "NoInternship") {
+      if (loadBatch) {
+        getStudentsWithNoInternship();
+      } else {
+        window.alert("Please select a batch");
+      }
+    }
+  };
+
+  const HandleStudentDelete = (e) => {
+    e.preventDefault();
+
+    if (studentDeleteFilter === "USN") {
+      DeleteStudentByUSN(studentDeleteUsn);
+    } else if (studentDeleteFilter === "Batch") {
+      DeleteStudentByBatch(studentDeleteBatch);
+    }
   };
 
   const HandleDelete = (e) => {
@@ -65,6 +144,66 @@ function Admin() {
     }
 
     setDeleteFilter("USN");
+  };
+
+  const getStudentsWithNoInternship = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(
+        "http://localhost:5000/api/getStudentsWithNoInternship",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ loadBatch }),
+        }
+      );
+
+      const data = await response.json();
+      setIsLoading(false);
+
+      if (data.message) {
+        setStudentData(data.message);
+      } else if (data.error) {
+        window.alert(data.error);
+      } else {
+        window.alert("Something went wrong please try again");
+      }
+    } catch (error) {
+      window.alert(error.message);
+      setIsLoading(false);
+    }
+  };
+
+  const UploadStudentData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(
+        "http://localhost:5000/api/uploadStudentData",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ studentjsonData }),
+        }
+      );
+
+      const data = await response.json();
+      setIsLoading(false);
+
+      if (data.message) {
+        window.alert(data.message);
+      } else if (data.error) {
+        window.alert(data.error);
+      } else {
+        window.alert("Something went wrong please try again");
+      }
+    } catch (error) {
+      window.alert(error.message);
+      setIsLoading(false);
+    }
   };
 
   const DeleteUserByUSN = async (deleteUsn) => {
@@ -94,6 +233,68 @@ function Admin() {
     } catch (error) {
       window.alert(error.message);
       setDeleteUsn("");
+      setIsLoading(false);
+    }
+  };
+
+  const DeleteStudentByUSN = async (studentDeleteUsn) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(
+        "http://localhost:5000/api/deleteStudentByUSN",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            studentDeleteUsn,
+          }),
+        }
+      );
+
+      const data = await response.json();
+      setIsLoading(false);
+      setStudentDeleteUsn("");
+
+      if (!data.message) {
+        window.alert("Something went wrong please try again");
+      } else {
+        window.alert(data.message);
+      }
+    } catch (error) {
+      window.alert(error.message);
+      setStudentDeleteUsn("");
+      setIsLoading(false);
+    }
+  };
+
+  const DeleteStudentByBatch = async (studentDeleteBatch) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(
+        "http://localhost:5000/api/deleteStudentByBatch",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            studentDeleteBatch,
+          }),
+        }
+      );
+
+      const data = await response.json();
+      setIsLoading(false);
+
+      if (!data.message) {
+        window.alert("Something went wrong please try again");
+      } else {
+        window.alert(data.message);
+      }
+    } catch (error) {
+      window.alert(error.message);
       setIsLoading(false);
     }
   };
@@ -306,6 +507,42 @@ function Admin() {
     }
   };
 
+  const fetchAllCompanyList = async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch("http://localhost:5000/api/getAllCompanyList", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          batch,
+        }),
+      });
+
+      const result = await res.json();
+      setIsLoading(false);
+
+      let companies = new Set();
+      if (result.error) {
+        window.alert(result.error);
+      } else {
+        const list = result.message;
+        list.forEach((data) => {
+          companies.add(data.nameOfIndustry.toUpperCase());
+        });
+      }
+      let allCompanies = [];
+      companies.forEach((ele) => {
+        allCompanies.push({ company: ele });
+      });
+      setData(allCompanies);
+    } catch (error) {
+      window.alert(error.message);
+      setIsLoading(false);
+    }
+  };
+
   const fetchDataByBatch = async () => {
     try {
       setIsLoading(true);
@@ -467,6 +704,14 @@ function Admin() {
     }
   };
 
+  const columns2 = [{ title: "Companies", field: "company" }];
+
+  const studentColumn = [
+    { title: "Name", field: "Name" },
+    { title: "USN", field: "USN" },
+    { title: "Batch", field: "Batch" },
+  ];
+
   const columns = [
     { title: "Name", field: "name", width: "80%" },
     { title: "USN", field: "USN" },
@@ -528,6 +773,7 @@ function Admin() {
                   <option value="USN">USN</option>
                   <option value="Mentor">Mentor</option>
                   <option value="Batch">Batch</option>
+                  <option value="Companies">Company list</option>
                   <option value="All">Show All</option>
                 </select>
               </label>
@@ -583,6 +829,25 @@ function Admin() {
               ) : (
                 ""
               )}
+              {filter === "Companies" ? (
+                <label className="column">
+                  Batch:
+                  <select
+                    className="input-col"
+                    value={batch}
+                    onChange={(e) => setBatch(e.target.value)}
+                  >
+                    <option>Select a Batch</option>
+                    {batches.map((batch, i) => (
+                      <option key={i} value={batch.batch}>
+                        {batch.batch}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : (
+                ""
+              )}
               <input className="login-button" type="submit" value="Filter" />
             </form>
           </div>
@@ -610,11 +875,12 @@ function Admin() {
               }}
               title="Internship Data"
               data={data}
-              columns={columns}
+              columns={filter === "Companies" ? columns2 : columns}
               options={{
                 search: true,
                 exportFileName: "Internship-Data",
                 paging: true,
+                filtering: true,
                 actionsColumnIndex: -1,
                 exportMenu: [
                   {
@@ -709,6 +975,183 @@ function Admin() {
                     value={deleteUsn}
                     placeholder="USN"
                     onChange={(e) => setDeleteUsn(e.target.value)}
+                  />
+                </label>
+              ) : (
+                ""
+              )}
+              <input className="login-button" type="submit" value="Delete" />
+            </form>
+          </div>
+        </div>
+        <div className="main-container">
+          <div className="filter-container">
+            <form onSubmit={HandleSubmit}>
+              <label className="column">
+                Load Data:
+                <select
+                  className="input-col"
+                  value={loadFilter}
+                  onChange={(e) => setLoadFilter(e.target.value)}
+                >
+                  <option value="UploadData">Upload Student Data</option>
+                  <option value="NoInternship">
+                    Students with 0 submissions
+                  </option>
+                </select>
+              </label>
+              {loadFilter === "UploadData" ? (
+                <div>
+                  <label className="column">
+                    Select Batch:
+                    <select
+                      className="input-col"
+                      value={loadBatch}
+                      onChange={(e) => setLoadBatch(e.target.value)}
+                    >
+                      <option>Select a Batch</option>
+                      {batches.map((batch, i) => (
+                        <option key={i} value={batch.batch}>
+                          {batch.batch}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="column">
+                    Upload File:
+                    <input
+                      className="input-col"
+                      type="file"
+                      onChange={(e) => setStudentFile(e.target.files[0])}
+                    />
+                  </label>
+                </div>
+              ) : (
+                ""
+              )}
+              {loadFilter === "NoInternship" ? (
+                <label className="column">
+                  Select Batch:
+                  <select
+                    className="input-col"
+                    value={loadBatch}
+                    onChange={(e) => setLoadBatch(e.target.value)}
+                  >
+                    <option>Select a Batch</option>
+                    {batches.map((batch, i) => (
+                      <option key={i} value={batch.batch}>
+                        {batch.batch}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : (
+                ""
+              )}
+              <input className="login-button" type="submit" value="Submit" />
+            </form>
+          </div>
+        </div>
+        <div className="main-container">
+          <div className="filter-container">
+            <MaterialTable
+              localization={{
+                body: {
+                  emptyDataSourceMessage: (
+                    <h2
+                      style={{
+                        marginTop: "6%",
+                        position: "absolute",
+                        top: "16%",
+                        marginLeft: "40%",
+                        marginRight: "40%",
+                        textAlign: "center",
+                      }}
+                    >
+                      No records to display
+                    </h2>
+                  ),
+                },
+              }}
+              title="Internship Data"
+              data={studentData}
+              columns={studentColumn}
+              options={{
+                search: true,
+                exportFileName: "Internship-Data",
+                paging: true,
+                filtering: true,
+                actionsColumnIndex: -1,
+                exportMenu: [
+                  {
+                    label: "Export PDF",
+                    exportFunc: (columns, data) =>
+                      ExportPdf(columns, data, "Internship-Data"),
+                  },
+                  {
+                    label: "Export CSV",
+                    exportFunc: (columns, data) =>
+                      ExportCsv(columns, data, "Internship-Data"),
+                  },
+                ],
+                headerStyle: {
+                  backgroundColor: "#383838",
+                  color: "White",
+                  whiteSpace: "nowrap",
+                },
+              }}
+            />
+            {loadFilter === "UploadData" ? (
+              <button className="login-button" onClick={UploadStudentData}>
+                Submit
+              </button>
+            ) : (
+              ""
+            )}
+          </div>
+        </div>
+        <div className="main-container">
+          <div className="filter-container">
+            <form onSubmit={HandleStudentDelete}>
+              <label className="column">
+                Delete By:
+                <select
+                  className="input-col"
+                  value={studentDeleteFilter}
+                  onChange={(e) => setStudentDeleteFilter(e.target.value)}
+                >
+                  <option value="USN">USN</option>
+                  <option value="Batch">Batch</option>
+                </select>
+              </label>
+              {studentDeleteFilter === "Batch" ? (
+                <label className="column">
+                  Batch:
+                  <select
+                    className="input-col"
+                    value={studentDeleteBatch}
+                    onChange={(e) => setStudentDeleteBatch(e.target.value)}
+                  >
+                    <option>Select a Batch</option>
+                    {batches.map((batch, i) => (
+                      <option key={i} value={batch.batch}>
+                        {batch.batch}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : (
+                ""
+              )}
+              {studentDeleteFilter === "USN" ? (
+                <label className="column">
+                  USN:
+                  <input
+                    className="input-col"
+                    type="text"
+                    value={studentDeleteUsn}
+                    placeholder="USN"
+                    onChange={(e) => setStudentDeleteUsn(e.target.value)}
                   />
                 </label>
               ) : (

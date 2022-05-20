@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  mentorName: {
+    type: String,
+    required: true,
+  },
   noOfInternship: {
     type: String,
     required: true,
@@ -70,10 +74,6 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   modeOfInternship: {
-    type: String,
-    required: true,
-  },
-  mentorName: {
     type: String,
     required: true,
   },
