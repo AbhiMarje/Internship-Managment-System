@@ -171,6 +171,10 @@ h2 {
     margin: 14px;
 }
 
+.MuiTableSortLabel-root:hover {
+  color: rgba(255, 255, 255, 0.637);
+}
+
 .lds-ring {
     display: inline-block;
     position: fixed;

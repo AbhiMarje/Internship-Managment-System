@@ -43,6 +43,9 @@ function Admin() {
 
   const convertToJSON = (header, data) => {
     const jsonData = [];
+    header.forEach((head, index) => {
+      header[index] = head.trim();
+    });
     data.forEach((row) => {
       row.push(loadBatch);
     });
@@ -860,7 +863,7 @@ function Admin() {
                   emptyDataSourceMessage: (
                     <h2
                       style={{
-                        marginTop: "6%",
+                        marginTop: "8%",
                         position: "absolute",
                         top: "16%",
                         marginLeft: "40%",
@@ -895,7 +898,7 @@ function Admin() {
                   },
                 ],
                 headerStyle: {
-                  backgroundColor: "#383838",
+                  backgroundColor: "#3d3d3d",
                   color: "White",
                   whiteSpace: "nowrap",
                 },
@@ -1060,7 +1063,7 @@ function Admin() {
                   emptyDataSourceMessage: (
                     <h2
                       style={{
-                        marginTop: "6%",
+                        marginTop: "8%",
                         position: "absolute",
                         top: "16%",
                         marginLeft: "40%",
@@ -1095,7 +1098,7 @@ function Admin() {
                   },
                 ],
                 headerStyle: {
-                  backgroundColor: "#383838",
+                  backgroundColor: "#3d3d3d",
                   color: "White",
                   whiteSpace: "nowrap",
                 },

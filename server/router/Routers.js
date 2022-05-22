@@ -500,8 +500,6 @@ router.post("/api/uploadStudentData", async (req, res) => {
   }
 });
 
-var isDeleted = "false";
-
 router.post("/api/ims", async (req, res) => {
   try {
     const {
@@ -585,9 +583,7 @@ router.post("/api/ims", async (req, res) => {
 
       await user.save();
 
-      const result = await deleteUser(USN);
-
-      console.log(result);
+      console.log(await deleteUser(USN));
 
       res.status(200).json({ message: "Submiited Successfully" });
     }
@@ -597,6 +593,7 @@ router.post("/api/ims", async (req, res) => {
 });
 
 async function deleteUser(USN) {
+  var isDeleted = "false";
   try {
     await Student.findOneAndDelete({ USN: USN }, (err, data) => {
       if (err) {
