@@ -46,7 +46,7 @@ function Home() {
       ) {
         window.alert("Please fill all the fields");
       } else {
-        const USN = usn.toUpperCase();
+        const USN = usn.toUpperCase().trim();
         let internshipNo;
         if (noOfInternship === "1st Internship") {
           internshipNo = "1st";

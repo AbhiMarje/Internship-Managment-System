@@ -9,6 +9,10 @@ const studentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  Mentor: {
+    type: String,
+    required: true,
+  },
   Batch: {
     type: String,
     required: true,

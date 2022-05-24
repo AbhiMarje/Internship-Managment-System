@@ -52,9 +52,9 @@ function Admin() {
     data.forEach((row) => {
       let rowData = {};
       row.forEach((element, i) => {
-        if (i === 2) {
+        if (i === 3) {
           rowData["Batch"] = element.trim();
-        } else if (i === 1) {
+        } else if (i === 0) {
           rowData[header[i]] = element.toUpperCase().trim();
         } else {
           rowData[header[i]] = element.trim();
@@ -710,8 +710,9 @@ function Admin() {
   const columns2 = [{ title: "Companies", field: "company" }];
 
   const studentColumn = [
-    { title: "Name", field: "Name" },
     { title: "USN", field: "USN" },
+    { title: "Name", field: "Name" },
+    { title: "Mentor", field: "Mentor" },
     { title: "Batch", field: "Batch" },
   ];
 
@@ -1085,6 +1086,7 @@ function Admin() {
                 paging: true,
                 filtering: true,
                 actionsColumnIndex: -1,
+                exportAllData: true,
                 exportMenu: [
                   {
                     label: "Export PDF",

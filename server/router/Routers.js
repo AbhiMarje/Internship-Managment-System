@@ -487,6 +487,7 @@ router.post("/api/uploadStudentData", async (req, res) => {
         const newStudent = new Student({
           USN: student.USN,
           Name: student.Name,
+          Mentor: student.Mentor,
           Batch: student.Batch,
         });
         await newStudent.save();
