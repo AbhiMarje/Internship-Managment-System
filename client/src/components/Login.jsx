@@ -41,8 +41,12 @@ function Login() {
   return (
     <div>
       <nav>
-        <img src={banner} alt="Banner" className="git-banner" />
-        <h1>KLS Gogte Institute of Technology</h1>
+        <div>
+          <div className="nav-container">
+            <img src={banner} alt="Banner" className="git-banner" />
+            <h1>KLS Gogte Institute of Technology</h1>
+          </div>
+        </div>
       </nav>
       <div className="main-container">
         <div className="login-container">

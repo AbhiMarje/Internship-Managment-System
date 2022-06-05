@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import banner from "./gitbanner.png";
 import Loading from "./Loading";
+import Notifications from "@material-ui/icons/NotificationsRounded";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
   const [name, setName] = useState("");
@@ -28,6 +30,7 @@ function Home() {
   const [batches, setBatches] = useState([]);
   const [mentors, setMentors] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     getBatches();
@@ -235,8 +238,16 @@ function Home() {
     <div>
       {isLoading ? <Loading /> : ""}
       <nav>
-        <img src={banner} alt="Banner" className="git-banner" />
-        <h1>KLS Gogte Institute of Technology</h1>
+        <div>
+          <div className="nav-container">
+            <img src={banner} alt="Banner" className="git-banner" />
+            <h1>KLS Gogte Institute of Technology</h1>
+          </div>
+        </div>
+        <div className="add-post" onClick={() => navigate("/posts")}>
+          <Notifications className="notifications" />
+          <p>New Opportunities</p>
+        </div>
       </nav>
       <div className="main-container">
         <div className="form-container">

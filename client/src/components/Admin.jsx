@@ -7,6 +7,7 @@ import Loading from "./Loading";
 import userContext from "./UserContext";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx/xlsx.mjs";
+import Notifications from "@material-ui/icons/NotificationsRounded";
 
 function Admin() {
   const { user } = useContext(userContext);
@@ -746,8 +747,16 @@ function Admin() {
     <div>
       {isLoading ? <Loading /> : ""}
       <nav>
-        <img src={banner} alt="Banner" className="git-banner" />
-        <h1>KLS Gogte Institute of Technology</h1>
+        <div>
+          <div className="nav-container">
+            <img src={banner} alt="Banner" className="git-banner" />
+            <h1>KLS Gogte Institute of Technology</h1>
+          </div>
+        </div>
+        <div className="add-post" onClick={() => navigate("/addposts")}>
+          <Notifications className="notifications" />
+          <p>New Opportunities</p>
+        </div>
       </nav>
       <div>
         <div className="admin-buttons-container">

@@ -5,6 +5,7 @@ const multer = require("multer");
 const fs = require("fs");
 const { promisify } = require("util");
 const unlinkAsync = promisify(fs.unlinkSync);
+const path = require("node:path");
 
 router.use(cors());
 
@@ -12,6 +13,7 @@ const User = require("../models/userSchema.js");
 const Batch = require("../models/Batch.js");
 const Mentors = require("../models/Mentors.js");
 const Student = require("../models/Student.js");
+const Posts = require("../models/Posts.js");
 
 router.post("/api/download", (req, res) => {
   const { filename } = req.body;
@@ -72,6 +74,56 @@ router.post(
   }
 );
 
+router.post("/api/fetchImage", (req, res) => {
+  const { imageName } = req.body;
+  console.log(imageName);
+  const fileLocation = path.join(__dirname, "../public/uploads/", imageName);
+  console.log(fileLocation);
+  res.sendFile(fileLocation);
+});
+
+router.post("/api/getposts", async (req, res) => {
+  try {
+    const { batch } = req.body;
+    if (!batch) {
+      res.status(400).json({ message: "Please enter batch" });
+    } else {
+      await Posts.find({ batch: batch }, (err, posts) => {
+        if (err) {
+          res.status(400).json({ error: "Something went wrong" });
+        } else if (!posts) {
+          res.status(400).json({ error: "No posts found" });
+        } else {
+          res.status(200).json({ message: posts });
+        }
+      }).clone();
+    }
+  } catch (err) {
+    res.status(400).json({ error: "Something went wrong" });
+  }
+});
+
+router.post("/api/addposts", async (req, res) => {
+  try {
+    const { title, description, batch, image, pdf } = req.body;
+    if (!title || !description || !batch || !image || !pdf) {
+      res.status(400).json({ message: "Please enter all fields" });
+    } else {
+      const post = new Posts({
+        title,
+        description,
+        batch,
+        image,
+        pdf,
+      });
+      await post.save();
+      res.status(200).json({ message: "Post added successfully" });
+    }
+  } catch (err) {
+    res.status(400).json({ message: "Something went wrong" });
+  }
+});
+
 router.post("/api/login", (req, res) => {
   try {
     const { username, password } = req.body;
@@ -82,7 +134,7 @@ router.post("/api/login", (req, res) => {
         res.status(400).json({ error: "Invalid Credentials" });
       }
     } else {
-      return res.status(400).json({ error: "Invalid Credentials" });
+      res.status(400).json({ error: "Invalid Credentials" });
     }
   } catch (err) {
     res.status(400).json({ error: "Something went wrong please try again" });
@@ -95,16 +147,14 @@ router.post("/api/deleteStudentByUSN", async (req, res) => {
     if (studentDeleteUsn) {
       await Student.findOne({ USN: studentDeleteUsn }, async (err, data) => {
         if (err) {
-          return res.status(400).json({ error: "Something went wrong" });
+          res.status(400).json({ error: "Something went wrong" });
         } else {
           if (data) {
             await Student.findOneAndDelete(
               { USN: studentDeleteUsn },
               (err, doc) => {
                 if (err) {
-                  return res
-                    .status(400)
-                    .json({ error: "Something went wrong" });
+                  res.status(400).json({ error: "Something went wrong" });
                 } else {
                   res
                     .status(200)
@@ -129,7 +179,7 @@ router.post("/api/deleteStudentByBatch", async (req, res) => {
     if (studentDeleteBatch) {
       await Student.deleteMany({ Batch: studentDeleteBatch }, (err, doc) => {
         if (err) {
-          return res.status(400).json({ error: "Something went wrong" });
+          res.status(400).json({ error: "Something went wrong" });
         } else {
           res.status(200).json({ message: "Users deleted successfully" });
         }
